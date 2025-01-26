@@ -1,3 +1,4 @@
+#Import Statements
 import cv2
 import numpy as np
 import face_recognition
@@ -5,17 +6,21 @@ import os
 import sys
 from datetime import datetime
 import mysql.connector as m
+
+#Database Connection
 pwd=input("Mysql Password:")
 con = mc.connect(host = 'localhost', user = 'root', passwd = pwd,database='dss')
 cur = con.cursor()
 # from PIL import ImageGrab
 
-
-path = 'C:\\Users\\M.Harini Vaishu\\Documents\\HARINI PADMA IT\\DSS\\IMAGESATTENDANCE'
+#Image Directory Setup
+path = 'C:\\Users\\mugilan\\Documents\\MUGILAN IT\\DSS\\IMAGESATTENDANCE'
 images = []
 classNames = []
 myList = os.listdir(path)
 print(myList)
+
+#Processing Images
 count=0
 for cl in myList:
     curImg = cv2.imread(f'{path}/{cl}')
@@ -25,6 +30,7 @@ for cl in myList:
     count+=1
 print(classNames)
 
+#Function to Encode Faces
 def findEncodings(images):
     encodeList = []
     for img in images:
@@ -33,7 +39,8 @@ def findEncodings(images):
         encode = face_recognition.face_encodings(img)[0]
         encodeList.append(encode)
     return encodeList
- 
+
+#Function to Mark Attendance
 def markAttendance(name):
     with open('Attendance.csv','r+') as f:
         myDataList = f.readlines()
@@ -51,12 +58,15 @@ def markAttendance(name):
 #     capScr = np.array(ImageGrab.grab(bbox))
 #     capScr = cv2.cvtColor(capScr, cv2.COLOR_RGB2BGR)
 #     return capScr
- 
+
+#Encoding Faces
 encodeListKnown = findEncodings(images)
 print('Encoding Complete')
- 
+
+#Capture Video from Webcam
 cap = cv2.VideoCapture(0)
 
+#Function to Check Time
 def time_chk(timer):
     if(timer>='08:30:00' and timer<='09:20:00'):
         hour='I'
@@ -77,6 +87,7 @@ def time_chk(timer):
         print("NO LOITTERING")
     return hour
 
+#Function to Query Database
 def database(reg,hour):
     cur.execute("SELECT * FROM STUDENT WHERE Reg_No="+reg)
     data=[]
@@ -100,6 +111,7 @@ def database(reg,hour):
     table = cur.fetchall()
     print(table)
 
+#Main Loop for Face Recognition
 while True:
     success, img = cap.read()
     #img = captureScreen()
@@ -130,7 +142,9 @@ while True:
             #timer = now.strftime('%H:%M:%S')
             #hour=time_chk(timer)
             #database(reg,hour)'''
-            #markAttendance(name)
+           #markAttendance(name)
+
+    #Display Results
     cv2.imshow('Webcam',img)
     cv2.waitKey(1)
 
